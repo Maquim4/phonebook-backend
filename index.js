@@ -1,6 +1,8 @@
+require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
+const Person = require('./models/person');
 
 const app = express();
 
@@ -39,7 +41,9 @@ let persons = [
 ];
 
 app.get('/api/persons', (request, response) => {
-  response.json(persons);
+  Person.find({}).then((persons) => {
+    response.json(persons);
+  });
 });
 
 app.get('/info', (request, response) => {
@@ -72,21 +76,16 @@ app.post('/api/persons', (request, response) => {
     return response.status(400).json({
       error: 'The name or number is missing',
     });
-  } else if (persons.find((p) => p.name === body.name)) {
-    return response.status(400).json({
-      error: 'name must be unique',
-    });
   }
 
-  const person = {
-    id: Math.floor(Math.random() * 1000),
+  const person = Person({
     name: body.name,
     number: body.number,
-  };
+  });
 
-  persons = persons.concat(person);
-
-  response.json(person);
+  person.save().then((savedPerson) => {
+    response.json(savedPerson);
+  });
 });
 
 const unknownEndpoint = (request, response) => {
@@ -95,7 +94,7 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
