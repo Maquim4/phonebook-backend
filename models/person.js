@@ -16,13 +16,25 @@ mongoose
     console.log('error connecting to MongoDB:', error.message);
   });
 
+const custom = [
+  function (value) {
+    return /^\d{2,3}-\d+$/.test(value);
+  },
+  'Uh oh, {PATH} does not equal format (**)*-***',
+];
+
 const personSchema = new mongoose.Schema({
   name: {
     type: String,
     minLength: 3,
     required: true,
   },
-  number: String,
+  number: {
+    type: String,
+    minLength: 8,
+    required: true,
+    validate: custom,
+  },
 });
 
 personSchema.set('toJSON', {
