@@ -100,9 +100,6 @@ app.put('/api/persons/:id', (request, response, next) => {
     { new: true, runValidators: true, context: 'query' }
   )
     .then((updatedPerson) => {
-      if (!updatedPerson) {
-        throw new Error('information deleted');
-      }
       response.json(updatedPerson);
     })
     .catch((error) => next(error));

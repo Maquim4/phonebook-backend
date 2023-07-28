@@ -16,13 +16,6 @@ mongoose
     console.log('error connecting to MongoDB:', error.message);
   });
 
-const custom = [
-  function (value) {
-    return /^\d{2,3}-\d+$/.test(value);
-  },
-  'Uh oh, {PATH} does not equal format (**)*-***',
-];
-
 const personSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -32,8 +25,13 @@ const personSchema = new mongoose.Schema({
   number: {
     type: String,
     minLength: 8,
-    required: true,
-    validate: custom,
+    validate: {
+      validator: function (value) {
+        return /^\d{2,3}-\d+$/.test(value);
+      },
+      message: (props) => `${props.value} is not a valid phone number!`,
+    },
+    required: [true, 'User phone number required'],
   },
 });
 
